@@ -1,0 +1,103 @@
+# DAIC-WOZ Dataset Configuration File
+# Configuration for data paths and label information
+
+# DAIC-WOZ dataset configuration
+daic_woz:
+  # Base path on server
+  data_root: "/nfs/scratch"
+  
+  # Dataset relative path
+  data_path: "dmamontov/daicwoz"
+  
+  # Full path will be: /nfs/scratch/dmamontov/daicwoz/
+  
+  # Participant ID range
+  participant_range:
+    start: 300
+    end: 491
+  
+  # File naming patterns
+  file_patterns:
+    audio: "{participant_id}_AUDIO.wav"
+    transcript: "{participant_id}_TRANSCRIPT.csv"
+  
+  # Folder naming pattern  
+  folder_pattern: "{participant_id}_P"
+  
+  # Expected audio file format
+  audio_format:
+    expected_sample_rate: 16000  # Hz
+    expected_channels: 1         # mono
+    expected_duration_min: 8     # minimum 8 minutes
+    expected_duration_max: 12    # maximum 12 minutes
+
+# Labels configuration
+labels:
+  # Label file path (relative to daicwoz folder)
+  file_path: "meta_info.csv"
+  
+  # Column name mapping (adjust based on actual meta_info.csv column names)
+  columns:
+    participant_id: "Participant_ID"     # participant ID column name
+    depression_binary: "PHQ8_Binary"     # binary classification label column
+    depression_score: "PHQ8_Score"       # depression score column name
+    # Add other column names here if available
+    
+  # Label value mapping
+  label_mapping:
+    depression_positive: 1    # depression positive
+    depression_negative: 0    # depression negative
+    
+  # Data filtering criteria
+  filtering:
+    exclude_missing_labels: true
+    exclude_invalid_audio: true
+    min_audio_duration: 5  # minimum 5 minutes
+
+# Output processing configuration
+output:
+  # Base directory for processed features
+  base_dir: "./data/processed/"
+  
+  # Subdirectories for different feature types
+  feature_dirs:
+    emotion: "emotion_features/"
+    wavlm: "wavlm_features/"
+    hubert: "hubert_features/"
+    wav2vec2: "wav2vec2_features/"
+    text: "text_features/"
+  
+  # File naming patterns
+  file_patterns:
+    feature_file: "participant_{participant_id}_{feature_type}_features.pkl"
+    summary_file: "{feature_type}_processing_summary.pkl" 
+    index_file: "{feature_type}_feature_index.csv"
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "./logs/data_processing.log"
+  
+# Validation configuration
+validation:
+  # Data integrity checks
+  check_audio_integrity: true
+  check_transcript_availability: true  
+  check_label_consistency: true
+  
+  # Sampling check (for quick validation)
+  sample_check:
+    enabled: true
+    n_samples: 5  # randomly check 5 samples
+    
+# Debug and development configuration
+debug:
+  # Test mode configuration
+  test_mode:
+    max_participants: 5
+    participant_ids: [300, 301, 302, 303, 304]  # specified test participants
+  
+  # Verbose logging
+  verbose: true
+  save_intermediate_results: true

@@ -1,0 +1,15 @@
+emotion_model:
+  name: "emotion-recognition-wav2vec2-IEMOCAP"
+  huggingface_id: "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
+  task: "feature-extraction"
+  
+audio_processing:
+  sample_rate: 16000
+  segment_length: 30  # seconds
+  overlap: 15         # seconds
+  min_segment_length: 5  # seconds
+  
+feature_extraction:
+  batch_size: 8
+  device: "cuda"
+  output_dir: "./data/processed/emotion_features/"

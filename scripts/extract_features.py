@@ -103,7 +103,7 @@ def main():
                        help='Output directory for features')
     parser.add_argument('--config', default='config/model_config.yaml', help='Config file path')
     parser.add_argument('--start_id', type=int, default=300, help='Starting participant ID')
-    parser.add_argument('--end_id', type=int, default=491, help='Ending participant ID')
+    parser.add_argument('--end_id', type=int, default=492, help='Ending participant ID')
     
     args = parser.parse_args()
     

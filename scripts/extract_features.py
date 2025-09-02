@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-DAIC-WOZ音频特征提取脚本
-用法: python scripts/extract_features.py --data_dir /path/to/daic_woz --output_dir ./data/processed
+DAIC-WOZ audio feature extraction script
+usage: python scripts/extract_features.py --data_dir /path/to/daic_woz --output_dir ./data/processed
 """
 
 import argparse
@@ -16,19 +16,19 @@ from src.data.audio_processor import AudioProcessor
 from src.models.feature_extractors import EmotionFeatureExtractor
 
 def load_config(config_path: str = "config/model_config.yaml"):
-    """加载配置文件"""
+    """load config file"""
     with open(config_path, 'r') as f:
         return yaml.safe_load(f)
 
 def get_daic_woz_files(data_root: str) -> List[Dict]:
-    """获取DAIC-WOZ数据文件路径和信息"""
-    # 数据路径: /nfs/scratch/dmamontov/daicwoz/
+    """Retrieve DAIC-WOZ data file paths and metadata"""
+    # data path: /nfs/scratch/dmamontov/daicwoz/
     data_path = Path(data_root) / "dmamontov" / "daicwoz"
     
     daic_files = []
     
-    # 遍历300_P到491_P文件夹
-    for participant_id in range(300, 492):  # 300到491 (包含491)
+    # Iterate through 300_P to 492_P folder
+    for participant_id in range(300, 493):  # 300 to 492 (include 492)
         folder_name = f"{participant_id}_P"
         participant_folder = data_path / folder_name
         

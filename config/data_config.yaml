@@ -38,9 +38,9 @@ labels:
   
   # Column name mapping (adjust based on actual meta_info.csv column names)
   columns:
-    participant_id: "Participant_ID"     # participant ID column name
-    depression_binary: "PHQ8_Binary"     # binary classification label column
-    depression_score: "PHQ8_Score"       # depression score column name
+    participant_id: "participant"     # participant ID column name
+    depression_binary: "target"     # binary classification label column
+    depression_score: "subset"       # train,dev and test
     # Add other column names here if available
     
   # Label value mapping

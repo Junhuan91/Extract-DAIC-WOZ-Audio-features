@@ -123,7 +123,7 @@ def main():
     )
     
     feature_extractor = EmotionFeatureExtractor(
-        model_id="/nfs/scratch/jtan/models/emotion-recognition-wav2vec2-IEMOCAP"
+        model_id=config['emotion_model']['huggingface_id']
     )
     
     # Get all DAIC-WOZ participant files

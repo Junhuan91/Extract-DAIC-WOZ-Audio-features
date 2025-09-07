@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 class DAICWOZDataLoader:
-    """DAIC-WOZ数据加载器"""
+    """DAIC-WOZ data loader"""
     
     def __init__(self, data_root: str, feature_dir: str, labels_file: str):
         self.data_root = Path(data_root)
@@ -14,14 +14,14 @@ class DAICWOZDataLoader:
         self.labels_df = None
         
     def load_labels(self) -> pd.DataFrame:
-        """加载抑郁症标签"""
+        """Load depression labels"""
         if self.labels_df is None:
             self.labels_df = pd.read_csv(self.labels_file)
-            # 假设标签文件有'participant_id'和'depression_label'列
+            
         return self.labels_df
     
     def load_single_feature(self, file_id: str) -> Dict:
-        """加载单个文件的特征"""
+        """load feature of single file"""
         feature_file = self.feature_dir / f"{file_id}_emotion_features.pkl"
         
         if not feature_file.exists():
@@ -32,7 +32,7 @@ class DAICWOZDataLoader:
             return pickle.load(f)
     
     def load_all_features(self) -> Tuple[List[np.ndarray], List[int]]:
-        """加载所有特征和标签"""
+        """load all features and labels"""
         labels_df = self.load_labels()
         
         features = []
@@ -40,14 +40,14 @@ class DAICWOZDataLoader:
         valid_ids = []
         
         for _, row in labels_df.iterrows():
-            file_id = row['participant_id']  # 根据实际列名调整
-            depression_label = row['depression_label']  # 根据实际列名调整
+            file_id = row['participant_id']  # Adjust according to actual column names
+            depression_label = row['depression_label']  # Adjust according to actual column names
             
             feature_data = self.load_single_feature(file_id)
             if feature_data:
-                # 使用聚合特征
+                # Use aggregated features
                 aggregated = feature_data['features']['aggregated']
-                # 将所有统计特征concatenate
+                # Concatenate all statistical features
                 feature_vector = np.concatenate([
                     aggregated['mean'],
                     aggregated['std'],

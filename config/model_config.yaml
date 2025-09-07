@@ -1,6 +1,6 @@
 emotion_model:
-  name: "emotion-recognition-wav2vec2-IEMOCAP"
-  huggingface_id: "/nfs/scratch/jtan/models/emotion-recognition-wav2vec2-IEMOCAP"
+  name: "wav2vec2-large-xlsr-53"
+  huggingface_id: "/nfs/scratch/jtan/models/wav2vec2-large-xlsr-53"
   task: "feature-extraction"
   
 audio_processing:

@@ -36,10 +36,10 @@ def check_data_paths(config):
     data_root = Path(config['daic_woz']['data_root'])
     data_path = data_root / config['daic_woz']['data_path']
     
-    print(f"📁 Data root: {data_root}")
-    print(f"📁 DAIC-WOZ path: {data_path}")
-    print(f"📁 Data root exists: {data_root.exists()}")
-    print(f"📁 DAIC-WOZ path exists: {data_path.exists()}")
+    print(f"Data root: {data_root}")
+    print(f"DAIC-WOZ path: {data_path}")
+    print(f"Data root exists: {data_root.exists()}")
+    print(f"DAIC-WOZ path exists: {data_path.exists()}")
     
     if not data_path.exists():
         print("DAIC-WOZ data path not found!")

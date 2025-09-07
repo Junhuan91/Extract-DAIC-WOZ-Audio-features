@@ -8,7 +8,7 @@ from pathlib import Path
 class EmotionFeatureExtractor:
     """Use SpeechBrain emotion recognition model to extract features"""
     
-    def __init__(self, model_id: str = "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"):
+    def __init__(self, model_id: str = "/nfs/scratch/jtan/models/emotion-recognition-wav2vec2-IEMOCAP"):
         self.model_id = model_id
         self.model = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

@@ -33,7 +33,7 @@ def get_daic_woz_files(data_root: str) -> List[Dict]:
         participant_folder = data_path / folder_name
         
         if participant_folder.exists():
-            # 查找音频和转录文件
+            # Search for audio and transcription files
             audio_file = participant_folder / f"{participant_id}_AUDIO.wav"
             transcript_file = participant_folder / f"{participant_id}_TRANSCRIPT.csv"
             
@@ -52,14 +52,14 @@ def get_daic_woz_files(data_root: str) -> List[Dict]:
 
 def process_single_participant(participant_info: Dict, audio_processor: AudioProcessor, 
                              feature_extractor: EmotionFeatureExtractor) -> Dict:
-    """处理单个参与者的数据"""
+    """Process data for a single participant"""
     participant_id = participant_info['participant_id']
     audio_path = participant_info['audio_path']
     transcript_path = participant_info['transcript_path']
     
     print(f"Processing Participant {participant_id}: {audio_path.name}")
     
-    # 1. 分段处理音频
+    # 1. Process audio in segments
     segments = audio_processor.process_long_audio(str(audio_path))
     if not segments:
         print(f"Failed to process audio for participant {participant_id}")
@@ -67,13 +67,13 @@ def process_single_participant(participant_info: Dict, audio_processor: AudioPro
     
     print(f"Created {len(segments)} segments for participant {participant_id}")
     
-    # 2. 特征提取
+    # 2. feature extraction
     features = feature_extractor.extract_features_from_audio(segments)
     if features is None:
         print(f"Failed to extract features for participant {participant_id}")
         return None
     
-    # 3. 读取转录文件（如果存在）
+    # 3. Read transcription file (if it exists)
     transcript_data = None
     if transcript_path and transcript_path.exists():
         try:
@@ -82,7 +82,7 @@ def process_single_participant(participant_info: Dict, audio_processor: AudioPro
         except Exception as e:
             print(f"Warning: Could not load transcript for {participant_id}: {e}")
     
-    # 4. 整合结果
+    # 4. Integrate results
     result = {
         'participant_id': participant_id,
         'folder_path': str(participant_info['folder_path']),
@@ -107,14 +107,14 @@ def main():
     
     args = parser.parse_args()
     
-    # 加载配置
+    # load config
     config = load_config(args.config)
     
-    # 创建输出目录
+    # create output directory
     output_path = Path(args.output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
     
-    # 初始化处理器
+    # Initialize processor
     audio_processor = AudioProcessor(
         sample_rate=config['audio_processing']['sample_rate'],
         segment_length=config['audio_processing']['segment_length'],
@@ -125,10 +125,10 @@ def main():
         model_id=config['emotion_model']['huggingface_id']
     )
     
-    # 获取所有DAIC-WOZ参与者文件
+    # Get all DAIC-WOZ participant files
     participant_files = get_daic_woz_files(args.data_root)
     
-    # 过滤指定范围的参与者
+    # Filter participants in the specified range
     filtered_files = [
         p for p in participant_files 
         if args.start_id <= p['participant_id'] <= args.end_id
@@ -136,7 +136,7 @@ def main():
     
     print(f"Processing {len(filtered_files)} participants (ID: {args.start_id}-{args.end_id})")
     
-    # 处理所有参与者
+    # Process all participants
     all_results = []
     failed_participants = []
     
@@ -145,7 +145,7 @@ def main():
             result = process_single_participant(participant_info, audio_processor, feature_extractor)
             
             if result:
-                # 保存单个参与者的特征
+                # Save features of a single participant
                 feature_file = output_path / f"participant_{result['participant_id']}_emotion_features.pkl"
                 with open(feature_file, 'wb') as f:
                     pickle.dump(result, f)
@@ -163,7 +163,7 @@ def main():
             print(f"Error processing participant {participant_info['participant_id']}: {e}")
             failed_participants.append(participant_info['participant_id'])
     
-    # 保存处理摘要
+    # Save processing summary
     summary = {
         'total_participants': len(filtered_files),
         'successful': len(all_results),
@@ -178,7 +178,7 @@ def main():
     with open(summary_file, 'wb') as f:
         pickle.dump(summary, f)
     
-    # 创建CSV索引文件
+    # create csv index files
     df = pd.DataFrame(all_results)
     df.to_csv(output_path / "daic_woz_feature_index.csv", index=False)
     

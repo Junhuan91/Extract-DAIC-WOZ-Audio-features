@@ -6,7 +6,7 @@ from typing import List, Tuple
 import soundfile as sf
 
 class AudioProcessor:
-    """处理DAIC-WOZ长音频的分段和预处理"""
+    """Process segmentation and preprocessing of DAIC-WOZ long audio"""
     
     def __init__(self, sample_rate: int = 16000, segment_length: int = 30, overlap: int = 15):
         self.sample_rate = sample_rate
@@ -14,7 +14,7 @@ class AudioProcessor:
         self.overlap = overlap
         
     def load_audio(self, audio_path: str) -> Tuple[np.ndarray, int]:
-        """加载音频文件"""
+        """load audio files"""
         try:
             audio, sr = librosa.load(audio_path, sr=self.sample_rate)
             return audio, sr
@@ -23,7 +23,7 @@ class AudioProcessor:
             return None, None
     
     def segment_audio(self, audio: np.ndarray, sr: int) -> List[np.ndarray]:
-        """将长音频分割成重叠的片段"""
+        """Segment long audio into overlapping chunks"""
         segment_samples = self.segment_length * sr
         hop_samples = (self.segment_length - self.overlap) * sr
         
@@ -35,7 +35,7 @@ class AudioProcessor:
             segments.append(segment)
             start += hop_samples
             
-        # 处理最后一个片段
+        # Process the last segment
         if start < len(audio):
             remaining = audio[start:]
             if len(remaining) >= self.sample_rate * 5:  # 至少5秒
@@ -44,12 +44,12 @@ class AudioProcessor:
         return segments
     
     def preprocess_segment(self, segment: np.ndarray) -> np.ndarray:
-        """预处理单个音频片段"""
-        # 归一化
+        """Preprocess individual audio segment"""
+        # Normalization
         if np.max(np.abs(segment)) > 0:
             segment = segment / np.max(np.abs(segment))
         
-        # 确保长度一致（padding或truncation）
+        # ensure consistent length（padding or truncation）
         target_length = self.segment_length * self.sample_rate
         if len(segment) < target_length:
             segment = np.pad(segment, (0, target_length - len(segment)))
@@ -59,7 +59,7 @@ class AudioProcessor:
         return segment
     
     def process_long_audio(self, audio_path: str) -> List[np.ndarray]:
-        """处理完整的长音频文件"""
+        """Process complete long audio files"""
         audio, sr = self.load_audio(audio_path)
         if audio is None:
             return []

@@ -12,6 +12,7 @@ import numpy as np
 from tqdm import tqdm
 import pickle
 
+from typing import List, Dict
 from src.data.audio_processor import AudioProcessor
 from src.models.feature_extractors import EmotionFeatureExtractor
 
@@ -51,7 +52,7 @@ def get_daic_woz_files(data_root: str) -> List[Dict]:
     return sorted(daic_files, key=lambda x: x['participant_id'])
 
 def process_single_participant(participant_info: Dict, audio_processor: AudioProcessor, 
-                             feature_extractor: EmotionFeatureExtractor) -> Dict:
+                             feature_extractor: EmotionFeatureExtractor) -> Dict | None:
     """Process data for a single participant"""
     participant_id = participant_info['participant_id']
     audio_path = participant_info['audio_path']
@@ -122,7 +123,7 @@ def main():
     )
     
     feature_extractor = EmotionFeatureExtractor(
-        model_id=config['emotion_model']['huggingface_id']
+        model_id="/nfs/scratch/jtan/models/emotion-recognition-wav2vec2-IEMOCAP"
     )
     
     # Get all DAIC-WOZ participant files

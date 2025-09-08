@@ -110,7 +110,7 @@ class HFAudioFeatureExtractor(BaseFeatureExtractor):
     def _embed_batch(self, segments: List[np.ndarray]) -> torch.Tensor:
         self._load()
         outs = []
-        # 分批送，省显存
+        # "Process in batches to save GPU memory
         for i in range(0, len(segments), self.segs_per_batch):
             batch = segments[i:i+self.segs_per_batch]
             inputs = self.processor(batch, sampling_rate=self.sample_rate,

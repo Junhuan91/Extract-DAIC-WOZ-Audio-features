@@ -1,70 +1,33 @@
-import librosa
-import numpy as np
-import torch
 from pathlib import Path
-from typing import List, Tuple
+import numpy as np
 import soundfile as sf
+import torchaudio
 
 class AudioProcessor:
-    """Process segmentation and preprocessing of DAIC-WOZ long audio"""
-    
-    def __init__(self, sample_rate: int = 16000, segment_length: int = 30, overlap: int = 15):
-        self.sample_rate = sample_rate
-        self.segment_length = segment_length
-        self.overlap = overlap
-        
-    def load_audio(self, audio_path: str) -> Tuple[np.ndarray, int]:
-        """load audio files"""
-        try:
-            audio, sr = librosa.load(audio_path, sr=self.sample_rate)
-            return audio, sr
-        except Exception as e:
-            print(f"Error loading {audio_path}: {e}")
-            return None, None
-    
-    def segment_audio(self, audio: np.ndarray, sr: int) -> List[np.ndarray]:
-        """Segment long audio into overlapping chunks"""
-        segment_samples = self.segment_length * sr
-        hop_samples = (self.segment_length - self.overlap) * sr
-        
-        segments = []
-        start = 0
-        
-        while start + segment_samples <= len(audio):
-            segment = audio[start:start + segment_samples]
-            segments.append(segment)
-            start += hop_samples
-            
-        # Process the last segment
-        if start < len(audio):
-            remaining = audio[start:]
-            if len(remaining) >= self.sample_rate * 5:  # 至少5秒
-                segments.append(remaining)
-                
-        return segments
-    
-    def preprocess_segment(self, segment: np.ndarray) -> np.ndarray:
-        """Preprocess individual audio segment"""
-        # Normalization
-        if np.max(np.abs(segment)) > 0:
-            segment = segment / np.max(np.abs(segment))
-        
-        # ensure consistent length（padding or truncation）
-        target_length = self.segment_length * self.sample_rate
-        if len(segment) < target_length:
-            segment = np.pad(segment, (0, target_length - len(segment)))
-        elif len(segment) > target_length:
-            segment = segment[:target_length]
-            
-        return segment
-    
-    def process_long_audio(self, audio_path: str) -> List[np.ndarray]:
-        """Process complete long audio files"""
-        audio, sr = self.load_audio(audio_path)
-        if audio is None:
-            return []
-            
-        segments = self.segment_audio(audio, sr)
-        processed_segments = [self.preprocess_segment(seg) for seg in segments]
-        
-        return processed_segments
+    def __init__(self, sample_rate=16000, segment_length=30, overlap=15):
+        self.sr = sample_rate
+        self.seg_len = int(segment_length * sample_rate)
+        hop = segment_length - overlap
+        self.hop_len = int(max(1, hop) * sample_rate)
+
+    def _load_mono_16k(self, path: str) -> np.ndarray:
+        # torchaudio more stable（large file/multi audio channel）,but soundfile is fine
+        wav, sr = torchaudio.load(path)  # (C, T)
+        if wav.shape[0] > 1:
+            wav = wav.mean(dim=0, keepdim=True)
+        if sr != self.sr:
+            wav = torchaudio.functional.resample(wav, sr, self.sr)
+        return wav.squeeze(0).cpu().numpy()
+
+    def process_long_audio(self, path: str):
+        x = self._load_mono_16k(path)
+        n = len(x)
+        segs = []
+        i = 0
+        while i + self.seg_len <= n:
+            segs.append(x[i:i+self.seg_len])
+            i += self.hop_len
+        if not segs and n > 0:
+            # short audio: complete segment
+            segs.append(x)
+        return segs

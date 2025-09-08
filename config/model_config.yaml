@@ -1,15 +1,12 @@
-emotion_model:
-  name: "emotion-recognition-wav2vec2-IEMOCAP"
-  huggingface_id: "/nfs/scratch/jtan/models/emotion-recognition-wav2vec2-IEMOCAP"
-  task: "feature-extraction"
-  
 audio_processing:
   sample_rate: 16000
-  segment_length: 30  # seconds
-  overlap: 15         # seconds
-  min_segment_length: 5  # seconds
-  
-feature_extraction:
-  batch_size: 8
-  device: "cuda"
-  output_dir: "./data/processed/emotion_features/"
+  segment_length: 30         # seconds
+  overlap: 15                # seconds
+
+emotion_model:
+  # Default to SpeechBrain (if --repo is passed via command line, use HuggingFace)
+  huggingface_id: "speechbrain/emotion-recognition-wav2vec2-IEMOCAP"
+
+runtime:
+  segments_per_batch: 8      # "If insufficient GPU memory, reduce to 4/2
+  fp16: true                 # Recommended to enable on GPU
